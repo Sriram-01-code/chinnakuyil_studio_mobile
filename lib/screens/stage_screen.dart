@@ -12,7 +12,7 @@ import '../models/song_model.dart';
 import 'studio_screen.dart';
 
 class StageScreen extends StatefulWidget {
-  final VoidCallback onSwitchToVault;
+  final VoidCallback onSwitchToVault; // Added missing callback
   const StageScreen({super.key, required this.onSwitchToVault});
 
   @override
@@ -23,7 +23,7 @@ class _StageScreenState extends State<StageScreen> {
   late ScrollController _scrollController;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  String? _activeSort;
+  String? _activeSort; 
   bool _isMaestroFilter = false;
 
   @override
@@ -79,7 +79,7 @@ class _StageScreenState extends State<StageScreen> {
             ),
             flexibleSpace: const GlassContainer(
               borderRadius: BorderRadius.zero,
-              child: SizedBox.shrink(), // FIXED: Provided required child
+              child: SizedBox.shrink(), // FIXED: Added required child
             ),
             centerTitle: true,
             title: Text("THE STAGE", style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 4, color: Colors.white)),
@@ -199,17 +199,7 @@ class _StageScreenState extends State<StageScreen> {
                   ],
                 ),
               ),
-              Column(
-                children: [
-                  if (song.difficulty == 'Masterpiece')
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(color: const Color(0xFFB76E79).withOpacity(0.2), borderRadius: BorderRadius.circular(5)),
-                      child: const Text("PRO", style: TextStyle(color: Color(0xFFB76E79), fontSize: 8, fontWeight: FontWeight.bold)),
-                    ),
-                  const Icon(Icons.chevron_right, color: Colors.white24),
-                ],
-              ),
+              const Icon(Icons.chevron_right, color: Colors.white24),
             ],
           ),
         ),

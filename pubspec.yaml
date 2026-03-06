@@ -12,15 +12,15 @@ dependencies:
     sdk: flutter
   
   # Backend
-  firebase_core: ^3.10.1
-  cloud_firestore: ^5.6.0
+  firebase_core: 3.6.0
+  cloud_firestore: 5.4.4
   http: ^1.2.0
   shared_preferences: ^2.2.2
   provider: ^6.1.1
   
   # Mobile Media & Recording
-  record: ^5.2.0
-  audioplayers: ^5.2.1
+  record: 5.1.0
+  audioplayers: 5.2.1
   youtube_player_iframe: ^5.2.1
   flutter_inappwebview: ^6.0.0
   path_provider: ^2.1.1
@@ -29,7 +29,7 @@ dependencies:
   path: ^1.9.0
   
   # Mobile Storage
-  sqflite: ^2.3.0
+  sqflite: 2.3.3+1
   
   # App Updates
   package_info_plus: ^4.2.0
