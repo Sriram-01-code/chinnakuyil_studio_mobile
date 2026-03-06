@@ -79,7 +79,7 @@ class _StageScreenState extends State<StageScreen> {
             ),
             flexibleSpace: const GlassContainer(
               borderRadius: BorderRadius.zero,
-              child: SizedBox.shrink(),
+              child: SizedBox.shrink(), // FIXED: Provided required child
             ),
             centerTitle: true,
             title: Text("THE STAGE", style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 4, color: Colors.white)),
