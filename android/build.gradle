@@ -13,9 +13,9 @@ subprojects {
 subprojects {
     if (project.name != "app") {
         project.ext.set("flutter", [
-            compileSdkVersion: 34,
+            compileSdkVersion: 35,
             minSdkVersion: 23,
-            targetSdkVersion: 34,
+            targetSdkVersion: 35,
         ])
     }
 
@@ -26,17 +26,13 @@ subprojects {
                     namespace = "com.chinnakuyil.studio.${project.name.replaceAll("-", "_")}"
                 }
 
-                compileSdk 34
+                compileSdk 35
 
-                // Force Java 11 compatibility for both Java and Kotlin
-                // This is the robust way to fix JVM Target Inconsistency 
-                // without requiring a specific JDK 11 installation (Toolchain).
                 compileOptions {
                     sourceCompatibility JavaVersion.VERSION_11
                     targetCompatibility JavaVersion.VERSION_11
                 }
 
-                // Handle Kotlin-specific JVM target
                 if (project.plugins.hasPlugin("org.jetbrains.kotlin.android")) {
                     project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
                         kotlinOptions {
@@ -47,14 +43,13 @@ subprojects {
 
                 if (project.name != "app" && !project.android.extensions.findByName("flutter")) {
                     project.android.extensions.add("flutter", [
-                        compileSdkVersion: 34,
+                        compileSdkVersion: 35,
                         minSdkVersion: 23,
-                        targetSdkVersion: 34,
+                        targetSdkVersion: 35,
                     ])
                 }
             }
 
-            // Manifest cleanup for AGP 8.1+
             project.tasks.configureEach { task ->
                 if (task.name.contains("process") && task.name.contains("Manifest")) {
                     task.doFirst {
