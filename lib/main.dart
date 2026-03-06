@@ -20,16 +20,23 @@ void main() async {
   ]);
 
   // Initialize Firebase
-  await Firebase.initializeApp(
-    options: const FirebaseOptions(
-      apiKey: "AIzaSyBksk9vx1jy4IpnHbZLG5TFEsu7At_WSb0",
-      authDomain: "chinnakuyil-studio.firebaseapp.com",
-      projectId: "chinnakuyil-studio",
-      storageBucket: "chinnakuyil-studio.firebasestorage.app",
-      messagingSenderId: "1084471800255",
-      appId: "1:1084471800255:web:b1df1ae948870f7100f10a",
-    ),
-  );
+  // Note: For Android APK, it is highly recommended to have 
+  // google-services.json in android/app/ folder.
+  // Using manual options here with the correct Android App ID.
+  try {
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: "AIzaSyBksk9vx1jy4IpnHbZLG5TFEsu7At_WSb0",
+        authDomain: "chinnakuyil-studio.firebaseapp.com",
+        projectId: "chinnakuyil-studio",
+        storageBucket: "chinnakuyil-studio.firebasestorage.app",
+        messagingSenderId: "1084471800255",
+        appId: "1:1084471800255:android:b88a7b86664ed11f00f10a", // UPDATED: Android App ID
+      ),
+    );
+  } catch (e) {
+    debugPrint("Firebase already initialized or error: $e");
+  }
 
   // Setup local services
   await MobileStorageService.initialize();
