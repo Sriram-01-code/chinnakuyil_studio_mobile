@@ -19,9 +19,9 @@ dependencies:
   provider: ^6.1.1
   
   # Mobile Media & Recording
-  record: 5.0.1
+  record: 5.1.0
   audioplayers: 5.2.1
-  youtube_player_iframe: ^5.1.0
+  youtube_player_iframe: ^5.2.1
   flutter_inappwebview: ^6.0.0
   path_provider: ^2.1.1
   permission_handler: ^11.0.1
@@ -38,9 +38,9 @@ dependencies:
   
   # UI & FX
   flutter_animate: ^4.5.0
-  google_fonts: 6.1.0
+  google_fonts: ^6.2.1
   confetti: ^0.7.0
-  vibration: ^1.8.4
+  vibration: ^2.0.1
   
   # Utilities
   device_info_plus: ^9.1.0
@@ -55,12 +55,7 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^3.0.0
 
-dependency_overrides:
-  # Force all platforms to use a synchronized, stable interface to fix build errors
-  record_platform_interface: 1.1.0
-  record_linux: 0.7.2
-  google_fonts: 6.1.0
-
+# No dependency_overrides to ensure clean cloud resolution
 flutter:
   uses-material-design: true
   assets:
