@@ -38,6 +38,7 @@ class _VaultScreenState extends State<VaultScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final appState = Provider.of<AppState>(context);
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: CustomScrollView(
@@ -47,6 +48,10 @@ class _VaultScreenState extends State<VaultScreen> {
             expandedHeight: 70,
             backgroundColor: Colors.transparent,
             elevation: 0,
+            leading: IconButton(
+              icon: const Icon(Icons.logout_rounded, color: Colors.white38, size: 20),
+              onPressed: () => appState.logout(),
+            ),
             flexibleSpace: const GlassContainer(
               borderRadius: BorderRadius.zero,
               child: SizedBox.shrink(),
@@ -193,7 +198,7 @@ class _VaultScreenState extends State<VaultScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.delete_outline, color: Colors.redAccent),
-              title: const Text("Delete permanently", style: TextStyle(color: Colors.redAccent)),
+              title: const Text("Delete Recording", style: TextStyle(color: Colors.redAccent)),
               onTap: () async {
                 Navigator.pop(context);
                 await FirebaseFirestore.instance.collection('vault_media').doc(media.mediaId).delete();

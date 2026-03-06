@@ -27,7 +27,6 @@ dependencies:
   permission_handler: ^11.0.1
   file_picker: ^6.1.1
   path: ^1.9.0
-  ffmpeg_kit_flutter_audio: ^6.0.3
   
   # Mobile Storage
   sqflite: ^2.3.0
