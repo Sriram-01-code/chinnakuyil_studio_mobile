@@ -1,0 +1,78 @@
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.buildDir = "../build"
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+
+subprojects {
+    if (project.name != "app") {
+        project.ext.set("flutter", [
+            compileSdkVersion: 34,
+            minSdkVersion: 23,
+            targetSdkVersion: 34,
+        ])
+    }
+
+    afterEvaluate { project ->
+        if (project.hasProperty('android')) {
+            project.android {
+                if (namespace == null) {
+                    namespace = "com.chinnakuyil.studio.${project.name.replaceAll("-", "_")}"
+                }
+
+                compileSdk 34
+
+                // Force Java 11 compatibility for both Java and Kotlin
+                // This is the robust way to fix JVM Target Inconsistency 
+                // without requiring a specific JDK 11 installation (Toolchain).
+                compileOptions {
+                    sourceCompatibility JavaVersion.VERSION_11
+                    targetCompatibility JavaVersion.VERSION_11
+                }
+
+                // Handle Kotlin-specific JVM target
+                if (project.plugins.hasPlugin("org.jetbrains.kotlin.android")) {
+                    project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+                        kotlinOptions {
+                            jvmTarget = "11"
+                        }
+                    }
+                }
+
+                if (project.name != "app" && !project.android.extensions.findByName("flutter")) {
+                    project.android.extensions.add("flutter", [
+                        compileSdkVersion: 34,
+                        minSdkVersion: 23,
+                        targetSdkVersion: 34,
+                    ])
+                }
+            }
+
+            // Manifest cleanup for AGP 8.1+
+            project.tasks.configureEach { task ->
+                if (task.name.contains("process") && task.name.contains("Manifest")) {
+                    task.doFirst {
+                        def manifestFile = file("${project.projectDir}/src/main/AndroidManifest.xml")
+                        if (manifestFile.exists()) {
+                            def content = manifestFile.text
+                            if (content.contains("package=")) {
+                                println "Fixing legacy manifest for: ${project.name}"
+                                manifestFile.text = content.replaceAll(/package="[^"]*"/, "")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}
