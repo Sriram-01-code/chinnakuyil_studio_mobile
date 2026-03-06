@@ -12,7 +12,7 @@ import '../models/song_model.dart';
 import 'studio_screen.dart';
 
 class StageScreen extends StatefulWidget {
-  final VoidCallback onSwitchToVault; // Added missing callback
+  final VoidCallback onSwitchToVault;
   const StageScreen({super.key, required this.onSwitchToVault});
 
   @override
@@ -23,7 +23,7 @@ class _StageScreenState extends State<StageScreen> {
   late ScrollController _scrollController;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  String? _activeSort; 
+  String? _activeSort; // null = A-Z default
   bool _isMaestroFilter = false;
 
   @override
@@ -48,13 +48,16 @@ class _StageScreenState extends State<StageScreen> {
     if (_isMaestroFilter) {
       filtered = filtered.where((s) => s.composer.toLowerCase().contains('ilaiyaraaja') || s.composer.toLowerCase().contains('ilayaraja'));
     }
+    
     List<SongModel> result = filtered.toList();
+    
     if (_activeSort == 'Newest') {
       result.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     } else if (_activeSort == 'Challenge') {
       final order = {'Easy': 0, 'Medium': 1, 'Hard': 2, 'Masterpiece': 3};
       result.sort((a, b) => (order[b.difficulty] ?? 0).compareTo(order[a.difficulty] ?? 0));
     } else {
+      // DEFAULT: A-Z
       result.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
     }
     return result;
@@ -79,7 +82,7 @@ class _StageScreenState extends State<StageScreen> {
             ),
             flexibleSpace: const GlassContainer(
               borderRadius: BorderRadius.zero,
-              child: SizedBox.shrink(), // FIXED: Added required child
+              child: SizedBox.shrink(), // FIXED: Required child provided
             ),
             centerTitle: true,
             title: Text("THE STAGE", style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 4, color: Colors.white)),
@@ -143,6 +146,7 @@ class _StageScreenState extends State<StageScreen> {
           const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ],
       ),
+      // ADD TRACK ENABLED FOR ALL
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => showDialog(context: context, builder: (_) => const AddSongModal()),
         backgroundColor: const Color(0xFFB76E79),
@@ -180,6 +184,7 @@ class _StageScreenState extends State<StageScreen> {
           final toVault = await Navigator.push(context, MaterialPageRoute(builder: (_) => StudioScreen(song: song)));
           if (toVault == true && mounted) widget.onSwitchToVault();
         },
+        // EDIT ENABLED FOR ALL
         onLongPress: () => showDialog(context: context, builder: (_) => EditSongModal(song: song)),
         child: GlassContainer(
           padding: const EdgeInsets.all(12),
@@ -194,11 +199,10 @@ class _StageScreenState extends State<StageScreen> {
                     Text(song.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
                     const SizedBox(height: 4),
                     Text("${song.movie} • ${song.composer}", style: const TextStyle(color: Colors.white38, fontSize: 11, letterSpacing: 0.5)),
-                    if (song.originalArtist.isNotEmpty)
-                      Text("By ${song.originalArtist}", style: const TextStyle(color: Colors.white24, fontSize: 10, fontStyle: FontStyle.italic)),
                   ],
                 ),
               ),
+              const Icon(Icons.edit_note, color: Colors.white24, size: 18),
               const Icon(Icons.chevron_right, color: Colors.white24),
             ],
           ),
