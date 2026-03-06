@@ -19,10 +19,7 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  // Initialize Firebase
-  // Note: For Android APK, it is highly recommended to have 
-  // google-services.json in android/app/ folder.
-  // Using manual options here with the correct Android App ID.
+  // Initialize Firebase with Android App ID
   try {
     await Firebase.initializeApp(
       options: const FirebaseOptions(
@@ -31,11 +28,11 @@ void main() async {
         projectId: "chinnakuyil-studio",
         storageBucket: "chinnakuyil-studio.firebasestorage.app",
         messagingSenderId: "1084471800255",
-        appId: "1:1084471800255:android:b88a7b86664ed11f00f10a", // UPDATED: Android App ID
+        appId: "1:1084471800255:android:b88a7b86664ed11f00f10a",
       ),
     );
   } catch (e) {
-    debugPrint("Firebase already initialized or error: $e");
+    debugPrint("Firebase init error: $e");
   }
 
   // Setup local services
