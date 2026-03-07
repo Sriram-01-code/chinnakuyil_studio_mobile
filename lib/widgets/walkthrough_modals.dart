@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:vibration/vibration.dart';
 import 'package:flutter/foundation.dart';
@@ -88,7 +87,7 @@ class _WalkthroughModalState extends State<WalkthroughModal> with TickerProvider
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Studio Guide ✨', style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                const Text('Studio Guide ✨', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
                 IconButton(onPressed: _completeWalkthrough, icon: const Icon(Icons.close, color: Colors.white24)),
               ],
             ),
@@ -104,9 +103,9 @@ class _WalkthroughModalState extends State<WalkthroughModal> with TickerProvider
                     children: [
                       Text(item.emoji, style: const TextStyle(fontSize: 70)).animate().scale(curve: Curves.elasticOut),
                       const SizedBox(height: 24),
-                      Text(item.title, style: GoogleFonts.poppins(fontSize: 24, fontWeight: FontWeight.bold, color: const Color(0xFFB76E79)), textAlign: TextAlign.center),
+                      Text(item.title, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFFB76E79)), textAlign: TextAlign.center),
                       const SizedBox(height: 16),
-                      Text(item.description, style: GoogleFonts.poppins(fontSize: 14, color: Colors.white70, height: 1.6), textAlign: TextAlign.center),
+                      Text(item.description, style: const TextStyle(fontSize: 14, color: Colors.white70, height: 1.6), textAlign: TextAlign.center),
                       const SizedBox(height: 24),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -116,7 +115,7 @@ class _WalkthroughModalState extends State<WalkthroughModal> with TickerProvider
                           children: [
                             const Icon(Icons.info_outline, color: Color(0xFFD4AF37), size: 14),
                             const SizedBox(width: 8),
-                            Text(item.tooltip, style: GoogleFonts.poppins(fontSize: 10, color: Colors.white38, fontStyle: FontStyle.italic)),
+                            Text(item.tooltip, style: const TextStyle(fontSize: 10, color: Colors.white38, fontStyle: FontStyle.italic)),
                           ],
                         ),
                       ),
@@ -175,11 +174,11 @@ class BirthdayPopupModal extends StatelessWidget {
           children: [
             const Text('✨', style: TextStyle(fontSize: 60)).animate().scale(duration: 1000.ms),
             const SizedBox(height: 20),
-            Text('A Belated Celebration... 🎂', style: GoogleFonts.playfairDisplay(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white), textAlign: TextAlign.center),
+            const Text('A Belated Celebration... 🎂', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white, fontFamily: 'serif'), textAlign: TextAlign.center),
             const SizedBox(height: 24),
             Text(
               "Happy Birthday, Chinnakuyil! ✨\n\nI know I'm a little late, but a voice as magical as yours deserves to be celebrated every single day. I built this studio specifically for you—a dedicated, private sanctuary where your melodies can be captured, archived, and cherished forever.\n\nThis isn't just an app; it's your personal stage. Whether you're singing a timeless Ilayaraja classic or exploring new melodies, this studio will breathe with you. May this belated gift bring as much joy to your heart as your music brings to everyone who hears it.",
-              style: GoogleFonts.poppins(fontSize: 14, color: Colors.white.withOpacity(0.85), height: 1.7), 
+              style: TextStyle(fontSize: 14, color: Colors.white.withOpacity(0.85), height: 1.7), 
               textAlign: TextAlign.center
             ),
             const SizedBox(height: 32),
@@ -198,7 +197,7 @@ class BirthdayPopupModal extends StatelessWidget {
                   elevation: 8,
                   shadowColor: const Color(0xFFB76E79).withOpacity(0.5),
                 ),
-                child: Text("Enter My Studio ✨", style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 16)),
+                child: const Text("Enter My Studio ✨", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 16)),
               ),
             ),
           ],
