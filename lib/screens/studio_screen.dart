@@ -4,7 +4,6 @@ import 'dart:math';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:record/record.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
@@ -46,6 +45,10 @@ class _StudioScreenState extends State<StudioScreen> {
   double _scrollSpeed = 1.0; 
   double _playbackVolume = 80.0;
   bool _isLyricsZoomed = false;
+  bool _isVideoPlaying = false;
+  double _videoDuration = 1.0;
+  double _currentVideoPos = 0.0;
+  Timer? _videoTrackingTimer;
 
   double _amplitudeValue = 0.0;
   StreamSubscription<Amplitude>? _amplitudeSubscription;
@@ -69,13 +72,32 @@ class _StudioScreenState extends State<StudioScreen> {
       ),
     );
 
+    _youtubeController.videoStateStream.listen((state) {
+      if (mounted) setState(() => _isVideoPlaying = state == PlayerState.playing);
+    });
+
+    _startVideoTracking();
     _lyricController.addListener(_handleManualScroll);
+  }
+
+  void _startVideoTracking() {
+    _videoTrackingTimer?.cancel();
+    _videoTrackingTimer = Timer.periodic(const Duration(milliseconds: 500), (t) async {
+      if (!mounted) { t.cancel(); return; }
+      final duration = await _youtubeController.duration;
+      final current = await _youtubeController.currentTime;
+      if (mounted) {
+        setState(() {
+          _videoDuration = duration > 0 ? duration : 1.0;
+          _currentVideoPos = current;
+        });
+      }
+    });
   }
 
   void _handleManualScroll() {
     if (!_autoScrollEnabled && _lyricController.hasClients) {
       const itemHeight = 70.0;
-      // Highlighting logic for Top-Highlight mode
       final topIndex = (_lyricController.offset / itemHeight).floor();
 
       if (topIndex != _activeLyricIndex && topIndex >= 0 && topIndex < _lyricsLines.length) {
@@ -92,6 +114,7 @@ class _StudioScreenState extends State<StudioScreen> {
     _successController.dispose();
     _autoScrollTimer?.cancel();
     _recordingTimer?.cancel();
+    _videoTrackingTimer?.cancel();
     _amplitudeSubscription?.cancel();
     super.dispose();
   }
@@ -99,30 +122,28 @@ class _StudioScreenState extends State<StudioScreen> {
   void _toggleAutoScroll() {
     setState(() {
       _autoScrollEnabled = !_autoScrollEnabled;
-      if (_autoScrollEnabled) _startAutoScroll();
-      else _autoScrollTimer?.cancel();
+      if (_autoScrollEnabled) {
+        _startAutoScroll();
+      } else {
+        _autoScrollTimer?.cancel();
+      }
     });
   }
 
   void _startAutoScroll() {
     _autoScrollTimer?.cancel();
-    _executeNextScrollStep();
-  }
-
-  void _executeNextScrollStep() {
-    if (!mounted || !_autoScrollEnabled) return;
-
-    final currentLyric = _lyricsLines[_activeLyricIndex].trim();
-    // INSTRUMENTAL DETECTION: Wait longer if the line is a marker like ... or 🎵
-    bool isInstrumental = currentLyric == '...' || currentLyric == '🎵';
-    int waitDuration = isInstrumental ? 8000 : 4000;
-
-    _autoScrollTimer = Timer(Duration(milliseconds: (waitDuration / _scrollSpeed).round()), () {
-      if (mounted && _autoScrollEnabled && _activeLyricIndex < _lyricsLines.length - 1) {
+    _centerLyricSmoothly(_activeLyricIndex);
+    final interval = Duration(milliseconds: (4000 / _scrollSpeed).round());
+    _autoScrollTimer = Timer.periodic(interval, (timer) {
+      if (!mounted || !_autoScrollEnabled) {
+        timer.cancel();
+        return;
+      }
+      if (_activeLyricIndex < _lyricsLines.length - 1) {
         setState(() => _activeLyricIndex++);
         _centerLyricSmoothly(_activeLyricIndex);
-        _executeNextScrollStep(); // Trigger next line
       } else {
+        timer.cancel();
         setState(() => _autoScrollEnabled = false);
       }
     });
@@ -131,7 +152,6 @@ class _StudioScreenState extends State<StudioScreen> {
   void _centerLyricSmoothly(int lyricIndex) {
     if (!_lyricController.hasClients) return;
     const itemHeight = 70.0;
-    // TOP-HIGHLIGHT LOGIC: Active line stays at the top of the scroll viewport
     final targetOffset = lyricIndex * itemHeight;
     
     _lyricController.animateTo(
@@ -198,7 +218,9 @@ class _StudioScreenState extends State<StudioScreen> {
     _recordingTimer?.cancel();
     _amplitudeSubscription?.cancel();
     setState(() { _isRecording = false; _autoScrollEnabled = false; _amplitudeValue = 0.0; });
-    if (!kIsWeb) try { Vibration.vibrate(pattern: [0, 100, 50, 100]); } catch (_) {}
+    if (!kIsWeb) {
+      try { Vibration.vibrate(pattern: [0, 100, 50, 100]); } catch (_) {}
+    }
     _successController.play();
     _showSuccessDialog(recordingPath: path);
   }
@@ -216,9 +238,9 @@ class _StudioScreenState extends State<StudioScreen> {
             children: [
               const Icon(Icons.check_circle_outline, color: Color(0xFFB76E79), size: 60),
               const SizedBox(height: 20),
-              Text("Session Complete", style: GoogleFonts.poppins(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+              const Text("Session Complete", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
-              Text(appState.recordingSuccessMessage, style: GoogleFonts.poppins(color: Colors.white70, fontSize: 14), textAlign: TextAlign.center),
+              Text(appState.recordingSuccessMessage, style: const TextStyle(color: Colors.white70, fontSize: 14), textAlign: TextAlign.center),
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
@@ -246,7 +268,7 @@ class _StudioScreenState extends State<StudioScreen> {
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           backgroundColor: const Color(0xFF1A1A1A),
-          title: Text("Lyrics Scroll Speed", style: GoogleFonts.poppins(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+          title: const Text("Lyrics Scroll Speed", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -259,12 +281,10 @@ class _StudioScreenState extends State<StudioScreen> {
                   setState(() { _scrollSpeed = val; if (_autoScrollEnabled) _startAutoScroll(); });
                 },
               ),
-              Text("${_scrollSpeed.toStringAsFixed(1)}x", style: GoogleFonts.poppins(color: const Color(0xFFB76E79), fontSize: 12, fontWeight: FontWeight.bold)),
+              Text("${_scrollSpeed.toStringAsFixed(1)}x", style: const TextStyle(color: Color(0xFFB76E79), fontSize: 12, fontWeight: FontWeight.bold)),
             ],
           ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text("Done", style: TextStyle(color: Color(0xFFB76E79)))),
-          ],
+          actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("Done", style: TextStyle(color: Color(0xFFB76E79))))],
         ),
       ),
     );
@@ -279,10 +299,11 @@ class _StudioScreenState extends State<StudioScreen> {
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.black,
       body: Stack(
         children: [
-          Positioned.fill(child: Container(color: Colors.black)),
+          Positioned.fill(child: Image.asset('assets/background.png', fit: BoxFit.cover)),
+          Positioned.fill(child: Container(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.black.withOpacity(0.6), Colors.black.withOpacity(0.95)])))),
           SafeArea(
             child: Column(
               children: [
@@ -316,7 +337,7 @@ class _StudioScreenState extends State<StudioScreen> {
       child: Row(
         children: [
           IconButton(icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white70, size: 20), onPressed: () => Navigator.pop(context)),
-          Expanded(child: Column(children: [Text("RECORDING SESSION", style: GoogleFonts.poppins(color: const Color(0xFFB76E79), letterSpacing: 2, fontWeight: FontWeight.w900, fontSize: 10)), Text(widget.song.title, style: GoogleFonts.poppins(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold), textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis)]))
+          const Expanded(child: Column(children: [Text("RECORDING SESSION", style: TextStyle(color: Color(0xFFB76E79), letterSpacing: 2, fontWeight: FontWeight.w900, fontSize: 10)), Text("NOW SINGING", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold), textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis)]))
         ],
       ),
     );
@@ -353,12 +374,12 @@ class _StudioScreenState extends State<StudioScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('LYRICS', style: GoogleFonts.poppins(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                const Text('LYRICS', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1)),
                 Row(
                   children: [
                     IconButton(icon: Icon(_isLyricsZoomed ? Icons.zoom_out : Icons.zoom_in, color: Colors.white54, size: 18), onPressed: () => setState(() => _isLyricsZoomed = !_isLyricsZoomed)),
                     GestureDetector(onTap: _showScrollSpeedDialog, child: Container(padding: const EdgeInsets.all(6), margin: const EdgeInsets.only(right: 8), decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), shape: BoxShape.circle), child: const Icon(Icons.speed, color: Colors.white54, size: 14))),
-                    GestureDetector(onTap: _toggleAutoScroll, child: Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: _autoScrollEnabled ? const Color(0xFFB76E79) : Colors.white10, borderRadius: BorderRadius.circular(20)), child: Row(children: [Icon(_autoScrollEnabled ? Icons.pause_circle_outline : Icons.play_circle_outline, color: Colors.white, size: 14), const SizedBox(width: 4), Text(_autoScrollEnabled ? "Auto-Scrolling" : "Manual", style: GoogleFonts.poppins(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold))]))),
+                    GestureDetector(onTap: _toggleAutoScroll, child: Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: _autoScrollEnabled ? const Color(0xFFB76E79) : Colors.white10, borderRadius: BorderRadius.circular(20)), child: Row(children: [Icon(_autoScrollEnabled ? Icons.pause_circle_outline : Icons.play_circle_outline, color: Colors.white, size: 14), const SizedBox(width: 4), Text(_autoScrollEnabled ? "Auto-Scrolling" : "Manual", style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold))]))),
                   ],
                 ),
               ],
@@ -374,7 +395,6 @@ class _StudioScreenState extends State<StudioScreen> {
               },
               child: ListView.builder(
                 controller: _lyricController,
-                // TOP-HIGHLIGHT PADDING: Ensures scroller starts at top and has room to move.
                 padding: const EdgeInsets.only(bottom: viewportHeight - itemHeight),
                 itemCount: _lyricsLines.length,
                 itemExtent: itemHeight,
@@ -383,7 +403,7 @@ class _StudioScreenState extends State<StudioScreen> {
                   return AnimatedDefaultTextStyle(
                     duration: const Duration(milliseconds: 300),
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.catamaran(
+                    style: TextStyle(
                       color: isActive ? Colors.white : Colors.white54,
                       fontSize: isActive ? (_isLyricsZoomed ? 34 : 26) : (_isLyricsZoomed ? 24 : 18),
                       fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
@@ -422,7 +442,7 @@ class _StudioScreenState extends State<StudioScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (_isRecording) Padding(padding: const EdgeInsets.only(bottom: 8.0), child: Text(_formatDuration(_recordingDuration), style: GoogleFonts.jetBrainsMono(color: Colors.redAccent, fontSize: 14, fontWeight: FontWeight.bold)).animate().fadeIn().scale()),
+              if (_isRecording) Padding(padding: const EdgeInsets.only(bottom: 8.0), child: Text(_formatDuration(_recordingDuration), style: const TextStyle(color: Colors.redAccent, fontSize: 14, fontWeight: FontWeight.bold, fontFamily: 'monospace')).animate().fadeIn().scale()),
               const SizedBox(width: 20),
               Stack(
                 alignment: Alignment.center,
@@ -441,12 +461,12 @@ class _StudioScreenState extends State<StudioScreen> {
             ],
           ),
           const SizedBox(height: 8),
-          Text(appState.recordingButtonText, style: GoogleFonts.poppins(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold)),
+          Text(appState.recordingButtonText, style: const TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.bold)),
         ],
       ),
     );
   }
 
-  Widget _buildCountdownOverlay() => Positioned.fill(child: BackdropFilter(filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10), child: Center(child: Text("$_countdownNumber", style: GoogleFonts.poppins(fontSize: 100, color: const Color(0xFFB76E79), fontWeight: FontWeight.bold)))));
+  Widget _buildCountdownOverlay() => Positioned.fill(child: BackdropFilter(filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10), child: Center(child: Text("$_countdownNumber", style: const TextStyle(fontSize: 100, color: Color(0xFFB76E79), fontWeight: FontWeight.bold)))));
   Widget _buildProcessingOverlay() => Positioned.fill(child: Container(color: Colors.black87, child: const Center(child: CircularProgressIndicator(color: Color(0xFFB76E79)))));
 }

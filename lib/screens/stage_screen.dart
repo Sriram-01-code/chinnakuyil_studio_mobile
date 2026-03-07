@@ -22,7 +22,7 @@ class _StageScreenState extends State<StageScreen> {
   late ScrollController _scrollController;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  String? _activeSort;
+  String? _activeSort; 
   bool _isMaestroFilter = false;
 
   @override
@@ -78,12 +78,12 @@ class _StageScreenState extends State<StageScreen> {
             ),
             flexibleSpace: const GlassContainer(
               borderRadius: BorderRadius.zero,
-              child: SizedBox.shrink(), // FIXED: Required child added
+              child: SizedBox.shrink(),
             ),
             centerTitle: true,
             title: const Text(
               "THE STAGE", 
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 4, color: Colors.white),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 4, color: Colors.white),
             ),
             actions: [
               IconButton(
@@ -200,10 +200,22 @@ class _StageScreenState extends State<StageScreen> {
                     Text(song.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
                     const SizedBox(height: 4),
                     Text("${song.movie} • ${song.composer}", style: const TextStyle(color: Colors.white38, fontSize: 11, letterSpacing: 0.5)),
+                    if (song.originalArtist.isNotEmpty)
+                      Text("By ${song.originalArtist}", style: const TextStyle(color: Colors.white24, fontSize: 10, fontStyle: FontStyle.italic)),
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right, color: Colors.white24),
+              Column(
+                children: [
+                  if (song.difficulty == 'Masterpiece')
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(color: const Color(0xFFB76E79).withOpacity(0.2), borderRadius: BorderRadius.circular(5)),
+                      child: const Text("PRO", style: TextStyle(color: Color(0xFFB76E79), fontSize: 8, fontWeight: FontWeight.bold)),
+                    ),
+                  const Icon(Icons.chevron_right, color: Colors.white24),
+                ],
+              ),
             ],
           ),
         ),
