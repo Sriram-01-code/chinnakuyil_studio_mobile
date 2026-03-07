@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../providers/app_state.dart';
 import '../widgets/glass_container.dart';
 
@@ -20,9 +19,9 @@ class _AuthScreenState extends State<AuthScreen> {
   Future<void> _handleLogin() async {
     if (_nameController.text.trim().isEmpty || _dobController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Please fill in both fields ✨', style: GoogleFonts.poppins()),
-          backgroundColor: Colors.orange[700],
+        const SnackBar(
+          content: Text('Please fill in both fields ✨'),
+          backgroundColor: Color(0xFFD32F2F),
         ),
       );
       return;
@@ -38,9 +37,9 @@ class _AuthScreenState extends State<AuthScreen> {
     if (!success) {
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Oops! Check the name and birthday again ✨', style: GoogleFonts.poppins()),
-          backgroundColor: Colors.red[400],
+        const SnackBar(
+          content: Text('Oops! Check the name and birthday again ✨'),
+          backgroundColor: Color(0xFFD32F2F),
         ),
       );
     }
@@ -48,12 +47,11 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Use MediaQuery for responsive design
     final screenSize = MediaQuery.of(context).size;
     final isSmallScreen = screenSize.height < 600;
 
     return Scaffold(
-      resizeToAvoidBottomInset: true, // Key for keyboard handling
+      resizeToAvoidBottomInset: true, 
       body: Stack(
         children: [
           Positioned.fill(
@@ -63,8 +61,6 @@ class _AuthScreenState extends State<AuthScreen> {
               errorBuilder: (context, error, stackTrace) => Container(color: Colors.black),
             ),
           ),
-          
-          // Background overlay
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
@@ -87,8 +83,6 @@ class _AuthScreenState extends State<AuthScreen> {
                     child: Column(
                       children: [
                         SizedBox(height: isSmallScreen ? 20 : 40),
-                        
-                        // Header section
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                           decoration: BoxDecoration(
@@ -96,28 +90,30 @@ class _AuthScreenState extends State<AuthScreen> {
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(color: Colors.white.withOpacity(0.1)),
                           ),
-                          child: Row(
+                          child: const Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.mic_external_on_rounded, size: 30, color: Colors.white),
-                              const SizedBox(width: 15),
+                              Icon(Icons.mic_external_on_rounded, size: 30, color: Colors.white),
+                              SizedBox(width: 15),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     'Chinnakuyil',
-                                    style: GoogleFonts.playfairDisplay(
+                                    style: TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.w700,
                                       color: Colors.white,
+                                      fontFamily: 'serif',
                                     ),
                                   ),
                                   Text(
                                     'Studio',
-                                    style: GoogleFonts.playfairDisplay(
+                                    style: TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.w300,
                                       color: Colors.white70,
+                                      fontFamily: 'serif',
                                     ),
                                   ),
                                 ],
@@ -125,55 +121,52 @@ class _AuthScreenState extends State<AuthScreen> {
                             ],
                           ),
                         ),
-                        
                         const Spacer(),
-                        
-                        // Auth Card
                         GlassContainer(
                           padding: const EdgeInsets.all(30),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(
+                              const Text(
                                 'Private Stage Access', 
-                                style: GoogleFonts.poppins(
+                                style: TextStyle(
                                   fontSize: 18, 
                                   color: Colors.white, 
                                   fontWeight: FontWeight.w600
                                 )
                               ),
                               const SizedBox(height: 8),
-                              Text(
+                              const Text(
                                 'Your unique stage awaits...', 
-                                style: GoogleFonts.poppins(
+                                style: TextStyle(
                                   fontSize: 12, 
                                   color: Colors.white60, 
                                   fontStyle: FontStyle.italic
                                 )
                               ),
                               const SizedBox(height: 30),
-                              
                               TextField(
                                 controller: _nameController,
-                                style: GoogleFonts.poppins(color: Colors.white),
+                                style: const TextStyle(color: Colors.white),
                                 textInputAction: TextInputAction.next,
                                 decoration: InputDecoration(
                                   labelText: 'First Name',
-                                  labelStyle: GoogleFonts.poppins(color: Colors.white70),
+                                  labelStyle: const TextStyle(color: Colors.white70),
                                   prefixIcon: const Icon(Icons.person_outline, color: Color(0xFFB76E79), size: 20),
+                                  hintText: 'Sriram / Sathi',
+                                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.2)),
                                   enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white.withOpacity(0.2))),
                                   focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFFB76E79))),
                                 ),
                               ),
                               const SizedBox(height: 25),
-                              
                               TextField(
                                 controller: _dobController,
                                 keyboardType: TextInputType.number,
-                                style: GoogleFonts.poppins(color: Colors.white),
+                                style: const TextStyle(color: Colors.white),
                                 decoration: InputDecoration(
                                   labelText: 'Birthday (DD/MM/YYYY)',
-                                  labelStyle: GoogleFonts.poppins(color: Colors.white70),
+                                  labelStyle: const TextStyle(color: Colors.white70),
                                   prefixIcon: const Icon(Icons.cake_outlined, color: Color(0xFFB76E79), size: 20),
                                   hintText: '04/03/2003',
                                   hintStyle: TextStyle(color: Colors.white.withOpacity(0.2)),
@@ -183,7 +176,6 @@ class _AuthScreenState extends State<AuthScreen> {
                                 onChanged: _formatDOB,
                               ),
                               const SizedBox(height: 40),
-                              
                               SizedBox(
                                 width: double.infinity,
                                 height: 55,
@@ -202,15 +194,14 @@ class _AuthScreenState extends State<AuthScreen> {
                                         height: 24,
                                         child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                                       )
-                                    : Text('Enter Studio', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold)),
+                                    : const Text('Enter Studio', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        
                         const Spacer(),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                       ],
                     ),
                   ),
@@ -226,18 +217,12 @@ class _AuthScreenState extends State<AuthScreen> {
   void _formatDOB(String value) {
     String cleanedText = value.replaceAll('/', '');
     if (cleanedText.isEmpty) return;
-    
-    // Only process digits
     if (!RegExp(r'^[0-9]+$').hasMatch(cleanedText)) return;
-    
     String formattedText = '';
-    
-    // Safe substring operations with bounds checking
     if (cleanedText.length >= 1) {
       final dayLength = cleanedText.length >= 2 ? 2 : cleanedText.length;
       formattedText += cleanedText.substring(0, dayLength);
     }
-    
     if (cleanedText.length >= 3) {
       formattedText += '/';
       final monthStart = 2;
@@ -246,7 +231,6 @@ class _AuthScreenState extends State<AuthScreen> {
         formattedText += cleanedText.substring(monthStart, monthEnd);
       }
     }
-    
     if (cleanedText.length >= 5) {
       formattedText += '/';
       final yearStart = 4;
@@ -255,8 +239,6 @@ class _AuthScreenState extends State<AuthScreen> {
         formattedText += cleanedText.substring(yearStart, yearEnd);
       }
     }
-    
-    // Update if different
     if (value != formattedText) {
       _dobController.value = TextEditingValue(
         text: formattedText,
