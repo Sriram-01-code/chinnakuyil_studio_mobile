@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:share_plus/share_plus.dart';
@@ -57,7 +57,7 @@ class _VaultScreenState extends State<VaultScreen> {
               child: SizedBox.shrink(),
             ),
             centerTitle: true,
-            title: Text("THE VAULT", style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 4, color: Colors.white)),
+            title: const Text("THE VAULT", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, letterSpacing: 4, color: Colors.white)),
             actions: [
               IconButton(
                 icon: const Icon(Icons.help_outline_rounded, color: Colors.white70),
@@ -140,7 +140,7 @@ class _VaultScreenState extends State<VaultScreen> {
                 child: Container(
                   width: 60, height: 60,
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(colors: [Color(0xFFB76E79), Color(0xFFD4AF37)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                    gradient: const LinearGradient(colors: [Color(0xFFB76E79), Color(0xFFD4AF37)]),
                     borderRadius: BorderRadius.circular(15),
                     boxShadow: [BoxShadow(color: const Color(0xFFB76E79).withOpacity(0.3), blurRadius: 10, spreadRadius: 2)],
                   ),
@@ -186,7 +186,7 @@ class _VaultScreenState extends State<VaultScreen> {
           children: [
             Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2))),
             const SizedBox(height: 20),
-            Text('Manage Recording', style: GoogleFonts.poppins(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+            const Text('Manage Recording', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 20),
             ListTile(
               leading: const Icon(Icons.edit_note, color: Colors.blueAccent),
@@ -220,10 +220,10 @@ class _VaultScreenState extends State<VaultScreen> {
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1A1A1A),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text("Rename Masterpiece", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+        title: const Text("Rename Masterpiece", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
         content: TextField(controller: controller, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: "New title", hintStyle: TextStyle(color: Colors.white24))),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text("Cancel", style: GoogleFonts.poppins(color: Colors.white54))),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel", style: TextStyle(color: Colors.white54))),
           ElevatedButton(
             onPressed: () async {
               await FirebaseFirestore.instance.collection('vault_media').doc(media.mediaId).update({'title': controller.text.trim()});
